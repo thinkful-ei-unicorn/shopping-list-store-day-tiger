@@ -1,3 +1,5 @@
+'use strict';
+
 const store = {
   items: [
     { id: cuid(), name: 'apples', checked: false },
@@ -6,13 +8,15 @@ const store = {
     { id: cuid(), name: 'bread', checked: false }
   ],
   hideCheckedItems: false
+  
 };
 
 const generateItemElement = function (item) {
   let itemTitle = `<span class='shopping-item shopping-item__checked'>${item.name}</span>`;
   if (!item.checked) {
-    itemTitle = `
-     <span class='shopping-item'>${item.name}</span>
+    itemTitle = 
+    `
+    <input name="item-edit" class="item-edit" type="text" value="${item.name}"/>
     `;
   }
 
@@ -25,6 +29,9 @@ const generateItemElement = function (item) {
         </button>
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
+        </button>
+        <button class="item-edit">
+          <span class='button-label'>edit</span>
         </button>
       </div>
     </li>`;
@@ -65,6 +72,7 @@ const render = function () {
 const addItemToShoppingList = function (itemName) {
   store.items.push({ id: cuid(), name: itemName, checked: false });
 };
+
 
 const handleNewItemSubmit = function () {
   $('#js-shopping-list-form').submit(function (event) {
@@ -145,6 +153,21 @@ const handleToggleFilterClick = function () {
   });
 };
 
+const editItemName = function (itemID, newItemName){
+  const idx = store.items.findIndex((idx) => item.id === itemID);
+  store.items[idx].name = newItemName;
+};
+
+const handleEditItem = function () {
+  $('.js-shopping-list').on('change','.edit-item', function(event){
+    event.preventDefault();
+    const itemID = getItemIdFromElement(event.currentTarget);
+    let newItemName = $(this).val();
+    editItemName(itemID, newItemName);
+    render();
+  });
+};
+
 /**
  * This function will be our callback when the
  * page loads. It is responsible for initially 
@@ -160,6 +183,7 @@ const handleShoppingList = function () {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
+  handleEditItem();
 };
 
 // when the page loads, call `handleShoppingList`
